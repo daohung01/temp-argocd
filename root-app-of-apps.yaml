@@ -10,9 +10,7 @@ spec:
   source:
     repoURL: https://github.com/daohung01/temp-argocd.git
     targetRevision: main
-    path: app/mytenant/nginx-app
-    directory:
-      recurse: true
+    path: apps/mytenant/nginx-app/overlays/stg
   destination:
     server: https://kubernetes.default.svc
     namespace: mytenant
