@@ -1,0 +1,17 @@
+# Optional Prometheus Helm values for stg. No secrets.
+fullnameOverride: prometheus-stg
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 20Gi
+alertmanager:
+  enabled: false
+kube-state-metrics:
+  enabled: true
+node-exporter:
+  enabled: true

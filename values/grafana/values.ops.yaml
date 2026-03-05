@@ -1,0 +1,12 @@
+# Optional Grafana Helm values (ops cluster). No secrets.
+# Reference from Application via additional source or merge into grafana-application.yaml.
+persistence:
+  enabled: true
+  size: 10Gi
+adminUser: admin
+# adminPassword: set via existingSecret (e.g. grafana-admin) in namespace ops
+service:
+  type: ClusterIP
+ingress:
+  enabled: false
+# datasources: add Prometheus dev/stg via sidecar or default datasources in real env

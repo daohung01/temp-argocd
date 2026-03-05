@@ -1,0 +1,17 @@
+# Optional Prometheus Helm values for dev. No secrets.
+fullnameOverride: prometheus-dev
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 20Gi
+alertmanager:
+  enabled: false
+kube-state-metrics:
+  enabled: true
+node-exporter:
+  enabled: true

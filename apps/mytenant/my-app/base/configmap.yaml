@@ -1,0 +1,11 @@
+# Non-sensitive config only. For secrets use Infisical/Secret in real repo.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-config
+  namespace: mytenant
+data:
+  HOST: ""
+  PORT: "8080"
+  LOG_LEVEL: "info"
+  # Add only non-secret keys here; no passwords, tokens, or API keys

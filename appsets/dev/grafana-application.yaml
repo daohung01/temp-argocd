@@ -1,0 +1,40 @@
+# Ops tools: Grafana — deployed in the ops cluster (namespace ops).
+# Single instance; managed by ops ArgoCD (dev app-of-apps syncs appsets/dev).
+# No admin password or secrets in template; set adminPassword via Secret or values in real env.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ops-grafana
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: labci-dev-apps-project
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: grafana
+    targetRevision: "7.3.0"
+    helm:
+      releaseName: grafana
+      values: |
+        persistence:
+          enabled: true
+          size: 10Gi
+        adminUser: admin
+        # adminPassword set via existingSecret or values in real env
+        service:
+          type: ClusterIP
+        ingress:
+          enabled: false
+        # Add datasources (e.g. Prometheus dev/stg) via sidecar or values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ops
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    automated:
+      prune: true
+      selfHeal: true

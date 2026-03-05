@@ -1,0 +1,57 @@
+# Logging: Fluent Bit for STG. Managed from ops ArgoCD, deployed per env (same pattern as Prometheus).
+# Single cluster: namespace logging-stg. Multi-cluster: set destination.server to stg cluster API.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fluent-bit-stg
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: labci-stg-apps-project
+  source:
+    repoURL: https://fluent.github.io/helm-charts
+    chart: fluent-bit
+    targetRevision: 0.55.0
+    helm:
+      releaseName: fluent-bit
+      values: |
+        rbac:
+          create: true
+          nodeAccess: true
+        serviceAccount:
+          create: true
+          name: fluent-bit
+        env: []
+        config:
+          inputs: |
+            [INPUT]
+                Name tail
+                Path /var/log/containers/*.log
+                multiline.parser docker, cri
+                Tag kube.*
+                Mem_Buf_Limit 10MB
+                Skip_Long_Lines On
+          filters: |
+            [FILTER]
+                Name kubernetes
+                Match kube.*
+                Merge_Log On
+                Keep_Log Off
+                K8S-Logging.Parser On
+                K8S-Logging.Exclude On
+          outputs: |
+            [OUTPUT]
+                Name stdout
+                Match *
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging-stg
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    automated:
+      prune: true
+      selfHeal: true

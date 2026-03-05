@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-worker
+  namespace: mytenant
+  labels:
+    app: my-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-worker
+  template:
+    metadata:
+      labels:
+        app: my-worker
+    spec:
+      containers:
+        - name: my-worker
+          image: 032794943726.dkr.ecr.ap-southeast-1.amazonaws.com/mytenant/my-worker:latest
+          command: ["node", "worker.js"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          envFrom:
+            - configMapRef:
+                name: my-worker-config

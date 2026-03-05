@@ -1,0 +1,39 @@
+# ApplicationSet template for STG — copy to e.g. labci-stg-<tenant>-appset.yml
+# Path apps/<tenant>/*/overlays/stg → segments: 0=apps, 1=tenant, 2=app-name, 3=overlays, 4=stg
+# Application name: {{index .path.segments 2}}-{{index .path.segments 4}}
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: labci-stg-<tenant>-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+        revision: HEAD
+        directories:
+          - path: apps/<tenant>/*/overlays/stg
+  template:
+    metadata:
+      name: '{{index .path.segments 2}}-{{index .path.segments 4}}'
+    spec:
+      project: labci-stg-apps-project
+
+      source:
+        repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '<target-namespace>'
+
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+        automated:
+          prune: true
+          selfHeal: false

@@ -1,0 +1,45 @@
+# Ops tools: Prometheus for STG — deployed in ops cluster, namespace monitoring-stg.
+# Managed by ops ArgoCD (stg app-of-apps). Scrapes stg workloads; Grafana can use as datasource.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-stg
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: labci-stg-apps-project
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: prometheus
+    targetRevision: "28.6.0"
+    helm:
+      releaseName: prometheus
+      values: |
+        fullnameOverride: prometheus-stg
+        prometheus:
+          prometheusSpec:
+            retention: 15d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 20Gi
+        alertmanager:
+          enabled: false
+        kube-state-metrics:
+          enabled: true
+        node-exporter:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring-stg
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    automated:
+      prune: true
+      selfHeal: true

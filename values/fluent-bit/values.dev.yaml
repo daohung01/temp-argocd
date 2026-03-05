@@ -1,0 +1,47 @@
+# Fluent Bit Helm values for dev (no secrets). Deployed to namespace logging-dev.
+# Use with Application spec.source.helm.valueFiles or merge into fluent-bit-application.yaml.
+# For OpenSearch: create Secret "opensearch-credentials" in namespace logging-dev and set envFrom in the Application.
+rbac:
+  create: true
+  nodeAccess: true
+
+serviceAccount:
+  create: true
+  name: fluent-bit
+
+# Non-secret env only
+env:
+  - name: OPENSEARCH_HOST
+    value: "opensearch.example.com"
+  - name: OPENSEARCH_PORT
+    value: "443"
+  - name: OPENSEARCH_INDEX_PREFIX
+    value: "labci-dev"
+
+# Uncomment and create Secret in namespace logging-dev for real OpenSearch
+# envFrom:
+#   - secretRef:
+#       name: opensearch-credentials
+#       optional: true
+
+config:
+  inputs: |
+    [INPUT]
+        Name tail
+        Path /var/log/containers/*.log
+        multiline.parser docker, cri
+        Tag kube.*
+        Mem_Buf_Limit 10MB
+        Skip_Long_Lines On
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+  outputs: |
+    [OUTPUT]
+        Name stdout
+        Match *

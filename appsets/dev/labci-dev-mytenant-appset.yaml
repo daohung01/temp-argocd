@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: labci-dev-mytenant-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+        revision: HEAD
+        directories:
+          - path: apps/mytenant/*/overlays/dev
+  template:
+    metadata:
+      name: '{{index .path.segments 2}}-{{index .path.segments 4}}'
+    spec:
+      project: labci-dev-apps-project
+
+      source:
+        repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'mytenant'
+
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+        automated:
+          prune: true
+          selfHeal: false

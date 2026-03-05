@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-cache
+  namespace: mytenant
+  labels:
+    app: my-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-cache
+  template:
+    metadata:
+      labels:
+        app: my-cache
+    spec:
+      containers:
+        - name: my-cache
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          envFrom:
+            - configMapRef:
+                name: my-cache-config

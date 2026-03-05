@@ -1,0 +1,46 @@
+# Ops tools: Prometheus for DEV — deployed in ops cluster, namespace monitoring-dev.
+# Managed by ops ArgoCD (dev app-of-apps). Scrapes dev workloads; Grafana can use as datasource.
+# No secrets in template; add alertmanager/auth in real env as needed.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: labci-dev-apps-project
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: prometheus
+    targetRevision: "28.6.0"
+    helm:
+      releaseName: prometheus
+      values: |
+        fullnameOverride: prometheus-dev
+        prometheus:
+          prometheusSpec:
+            retention: 15d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 20Gi
+        alertmanager:
+          enabled: false
+        kube-state-metrics:
+          enabled: true
+        node-exporter:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring-dev
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    automated:
+      prune: true
+      selfHeal: true
