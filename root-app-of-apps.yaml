@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/daohung01/temp-argocd.git
-    targetRevision: HEAD
+    targetRevision: main
     path: appsets
     directory:
       recurse: true

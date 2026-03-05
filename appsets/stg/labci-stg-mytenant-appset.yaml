@@ -9,7 +9,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/daohung01/temp-argocd.git
-        revision: HEAD
+        revision: main
         directories:
           - path: apps/mytenant/*/overlays/stg
   template:
@@ -20,7 +20,7 @@ spec:
 
       source:
         repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
-        targetRevision: HEAD
+        targetRevision: main
         path: '{{.path.path}}'
 
       destination:
