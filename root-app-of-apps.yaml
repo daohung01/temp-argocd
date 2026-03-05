@@ -1,100 +1,4 @@
----
-# AppProject for the apps (child applications)
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: labci-dev-apps-project
-  namespace: argocd
-spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  description: App of labci-dev-apps-project applications
-  destinations:
-    - namespace: istio-system
-      server: https://kubernetes.default.svc
-    - namespace: ops
-      server: https://kubernetes.default.svc
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-    - namespace: monitoring-dev
-      server: https://kubernetes.default.svc
-    - namespace: logging-dev
-      server: https://kubernetes.default.svc
-    - namespace: mytenant
-      server: https://kubernetes.default.svc
-    # Add your tenant namespaces here
-    # - namespace: labci-<tenant>-<product>
-    #   server: https://kubernetes.default.svc
-  sourceRepos:
-    - https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
-    - https://fluent.github.io/helm-charts
-    - https://grafana.github.io/helm-charts
-    - https://prometheus-community.github.io/helm-charts
----
-# AppProject for the dev app-of-apps
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: labci-dev-apps-deployments-project
-  namespace: argocd
-spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  description: App of labci-dev-apps-deployments applications
-  destinations:
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-  sourceRepos:
-    - https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
----
-# AppProject for STG child applications
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: labci-stg-apps-project
-  namespace: argocd
-spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  description: App of labci-stg-apps-project applications
-  destinations:
-    - namespace: istio-system
-      server: https://kubernetes.default.svc
-    - namespace: ops
-      server: https://kubernetes.default.svc
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-    - namespace: monitoring-stg
-      server: https://kubernetes.default.svc
-    - namespace: logging-stg
-      server: https://kubernetes.default.svc
-    - namespace: mytenant
-      server: https://kubernetes.default.svc
-  sourceRepos:
-    - https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
-    - https://fluent.github.io/helm-charts
-    - https://prometheus-community.github.io/helm-charts
----
-# AppProject for the stg app-of-apps
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: labci-stg-apps-deployments-project
-  namespace: argocd
-spec:
-  clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  description: App of labci-stg-apps-deployments applications
-  destinations:
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-  sourceRepos:
-    - https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
----
+
 # Root Application: DEV — deploy nginx app only
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -104,7 +8,7 @@ metadata:
 spec:
   project: labci-dev-apps-project
   source:
-    repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+    repoURL: https://github.com/daohung01/temp-argocd.git
     targetRevision: HEAD
     path: apps/mytenant/nginx-app/overlays/dev
 
@@ -128,7 +32,7 @@ metadata:
 spec:
   project: labci-stg-apps-project
   source:
-    repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+    repoURL: https://github.com/daohung01/temp-argocd.git
     targetRevision: HEAD
     path: apps/mytenant/nginx-app/overlays/stg
 
