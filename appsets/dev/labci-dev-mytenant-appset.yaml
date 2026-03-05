@@ -8,7 +8,7 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
-        repoURL: https://gitlab.labci.com/labci/ops/argocd-deployment/labci/apps-deployments.git
+        repoURL: https://github.com/daohung01/temp-argocd.git
         revision: HEAD
         directories:
           - path: apps/mytenant/*/overlays/dev
